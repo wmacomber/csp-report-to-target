@@ -57,3 +57,142 @@ CSP add_header line:
 Note we included *both* report-uri *and* report-to in the Content-Security-Policy header.  That's for compatibility.  Remember that the "Report-To" header is necessary to make the CSP "report-to" directive work properly.
 
 ** Firefox doesn't know how to handle CSP's "report-to" directive, instead looking for the "report-uri" directive.  Firefox also uses a different data format and Content-Type (application/csp-report) than the  link-based browsers do (application/reports+json), but that only really matters on the report-receiving application side.
+
+## Sample Application Console Output
+(I'd bet anyone who ever finds this repo on purpose is looking for what's in this section)
+
+```
+csp-report-to-target listening on port 3002
+==========
+--- Gecko Firefox (application/csp-report) POST - /report-uri:
+OUTPUT:
+{
+  timestamp: 1652229387725,
+  'blocked-uri': 'https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap',
+  'line-number': undefined,
+  'column-number': undefined,
+  'document-uri': 'https://web.site/test.html',
+  'source-file': undefined,
+  'violated-directive': 'default-src',
+  'original-policy': "default-src 'self'; report-uri https://web.site/csp-report-to-target/report-uri",
+  message: 'Violation of default-src. Problem(s) in https://web.site/test.html. Blocked URI is https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap.'
+}
+==========
+--- Gecko Firefox (application/csp-report) POST - /report-uri:
+OUTPUT:
+{
+  timestamp: 1652229387753,
+  'blocked-uri': 'inline',
+  'line-number': 9,
+  'column-number': 1,
+  'document-uri': 'https://web.site/test.html',
+  'source-file': 'https://web.site/test.html',
+  'violated-directive': 'default-src',
+  'original-policy': "default-src 'self'; report-uri https://web.site/csp-report-to-target/report-uri",
+  message: 'Violation of default-src. Problem(s) in https://web.site/test.html. Line 9, column 1.'
+}
+```
+
+```
+==========
+--- Blink Edge (application/reports+json) POST - /report-to:
+OUTPUT:
+{
+  timestamp: 1652229489876,
+  items: [
+    {
+      'blocked-uri': 'https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap',
+      'line-number': 7,
+      'column-number': undefined,
+      'document-uri': 'https://web.site/test.html',
+      'source-file': 'https://web.site/test.html',
+      'violated-directive': 'style-src-elem',
+      'original-policy': "default-src 'self'; report-uri https://web.site/csp-report-to-target/report; report-to csp-test;",
+      'actual-timestamp': 1652229489876,
+      message: 'Violation of style-src-elem. Problem(s) in https://web.site/test.html. Blocked URI is https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap.'
+    }
+  ]
+}
+==========
+--- Blink Edge (application/reports+json) POST - /report-to:
+OUTPUT:
+{
+  timestamp: 1652229549801,
+  items: [
+    {
+      'blocked-uri': 'inline',
+      'line-number': 37,
+      'column-number': undefined,
+      'document-uri': 'https://web.site/test.html',
+      'source-file': 'https://web.site/test.html',
+      'violated-directive': 'script-src-elem',
+      'original-policy': "default-src 'self'; report-uri https://web.site/csp-report-to-target/report; report-to csp-test;",
+      'actual-timestamp': 1652229489830,
+      message: 'Violation of script-src-elem. Problem(s) in https://web.site/test.html. Line 37.'
+    },
+    {
+      'blocked-uri': 'inline',
+      'line-number': 9,
+      'column-number': undefined,
+      'document-uri': 'https://web.site/test.html',
+      'source-file': 'https://web.site/test.html',
+      'violated-directive': 'style-src-elem',
+      'original-policy': "default-src 'self'; report-uri https://web.site/csp-report-to-target/report; report-to csp-test;",
+      'actual-timestamp': 1652229489798,
+      message: 'Violation of style-src-elem. Problem(s) in https://web.site/test.html. Line 9.'
+    }
+  ]
+}
+```
+
+```
+==========
+--- Blink Chrome (application/reports+json) POST - /report-to:
+OUTPUT:
+{
+  timestamp: 1652229690116,
+  items: [
+    {
+      'blocked-uri': 'https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap',
+      'line-number': 7,
+      'column-number': undefined,
+      'document-uri': 'https://web.site/test.html',
+      'source-file': 'https://web.site/test.html',
+      'violated-directive': 'style-src-elem',
+      'original-policy': "default-src 'self'; report-uri https://web.site/csp-report-to-target/report-uri; report-to csp-test;",
+      'actual-timestamp': 1652229690116,
+      message: 'Violation of style-src-elem. Problem(s) in https://web.site/test.html. Blocked URI is https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap.'
+    }
+  ]
+}
+==========
+--- Blink Chrome (application/reports+json) POST - /report-to:
+OUTPUT:
+{
+  timestamp: 1652229750062,
+  items: [
+    {
+      'blocked-uri': 'inline',
+      'line-number': 37,
+      'column-number': undefined,
+      'document-uri': 'https://web.site/test.html',
+      'source-file': 'https://web.site/test.html',
+      'violated-directive': 'script-src-elem',
+      'original-policy': "default-src 'self'; report-uri https://web.site/csp-report-to-target/report-uri; report-to csp-test;",
+      'actual-timestamp': 1652229690084,
+      message: 'Violation of script-src-elem. Problem(s) in https://web.site/test.html. Line 37.'
+    },
+    {
+      'blocked-uri': 'inline',
+      'line-number': 9,
+      'column-number': undefined,
+      'document-uri': 'https://web.site/test.html',
+      'source-file': 'https://web.site/test.html',
+      'violated-directive': 'style-src-elem',
+      'original-policy': "default-src 'self'; report-uri https://web.site/csp-report-to-target/report-uri; report-to csp-test;",
+      'actual-timestamp': 1652229690060,
+      message: 'Violation of style-src-elem. Problem(s) in https://web.site/test.html. Line 9.'
+    }
+  ]
+}
+```
